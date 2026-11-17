@@ -15,7 +15,6 @@ $("#verify").onclick=()=>{const c=chapters[state.chapter],chosen=[...$("#checkli
 $("#closeDeduction").onclick=()=>$("#deduction").hidden=true;
 $("#nextChapter").onclick=()=>{if(!state.completed[state.chapter])return;if(state.chapter===3){$("#game").hidden=true;$("#ending").hidden=false;window.scrollTo(0,0);return}state.chapter++;save();$("#deduction").hidden=true;render();window.scrollTo(0,0)};
 $("#hintButton").onclick=()=>{const n=Math.min(3,++state.hints[state.chapter]);const c=chapters[state.chapter];$("#hint").textContent=n===1?"Внимательно прочитай обороты документов.":n===2?c.clue:"Для версии нужны: "+c.need.map(i=>c.docs[i][0]).join(", ")+". Важно не только выбрать правильный ответ, но и предъявить эти материалы.";save()};
-$("#audioButton").onclick=()=>{state.sound=!state.sound;
 const puzzleInfo=[
 {title:"Дверь архива B2",intro:"Оперативная группа находится у двери. Сервисный код указан на обороте журнала замков. Введи код, чтобы передать его группе.",kind:"code",answer:"2131",need:[1,5],success:"Замок открыт. В архиве найден живой Антон Ветров. Он сообщает, что Орлова заперла его после разговора о печати М-17."},
 {title:"Конверт №0714",intro:"На столе запечатанный конверт. Найди номер архивной заявки в документах и вскрой его.",kind:"code",answer:"0714",need:[3,5],success:"Печать сломана. Внутри распоряжение: описи М-17 вывезти в контейнере C-17 на склад №4 для уничтожения в 06:00."},
@@ -38,6 +37,8 @@ $("#puzzle").hidden=false
 function finishPuzzle(){if(!Array.isArray(state.puzzles))state.puzzles=[false,false,false,false];state.puzzles[state.chapter]=true;save();$("#puzzleControls").innerHTML='<div class="stamp">✓ ПРОВЕРЕНО</div>';$("#puzzleResult").textContent=puzzleInfo[state.chapter].success;render();sound("success")}
 $("#closePuzzle").onclick=()=>$("#puzzle").hidden=true;
 
+
+$("#audioButton").onclick=()=>{state.sound=!state.sound;
 $("#audioButton").textContent=state.sound?"● ЗВУК ВКЛЮЧЁН":"◌ ВКЛЮЧИТЬ ЗВУК";save();sound("paper")};
 $("#export").onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="delo308-save.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $("#import").onchange=async e=>{const file=e.target.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!Array.isArray(data.seen)||data.seen.length!==4||!Array.isArray(data.completed)||data.completed.length!==4)throw Error("Некорректный файл");state={...state,...data};state.chapter=Math.max(0,Math.min(3,Number(state.chapter)||0));save();$("#ending").hidden=true;$("#game").hidden=false;render()}catch(err){alert("Не удалось загрузить сохранение")}e.target.value=""};
