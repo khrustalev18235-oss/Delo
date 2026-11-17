@@ -215,32 +215,59 @@ $("#audioButton").textContent=state.sound?"● ЗВУК ВКЛЮЧЁН":"◌ В�
 const stage=document.getElementById("webglStage"),surface=document.getElementById("deskSurface");
 let THREE,renderer,scene,camera,light,raycaster,mouse,papers=[],raf=0,drag=null,ready=false,ground,dragPlane;const status=document.getElementById("webglStatus");
 const slots=[[-2.5,-1.3],[-.05,-1.4],[2.4,-1.2],[-2.5,1.1],[.05,1.1],[2.45,1.2]];
-function textureFor(d,i,chapter){
-const c=document.createElement("canvas");c.width=512;c.height=640;const x=c.getContext("2d");
-x.fillStyle=["#ded0b1","#c3cbbd","#e3d7bb","#c2c6c0","#d4c4a9","#e4d9c4"][i];x.fillRect(0,0,512,640);
-for(let n=0;n<1300;n++){x.fillStyle="rgba(60,45,25,"+(Math.random()*.045)+")";x.fillRect(Math.random()*512,Math.random()*640,2,2)}
-x.fillStyle="#544a36";x.font="bold 16px monospace";x.fillText("ДЕЛО 308 / "+(chapter+1)+" / "+(i+1),30,45);x.fillRect(30,62,450,2);
-x.fillStyle="#2b2c26";x.font="bold 28px Georgia";let title=d[0];if(title.length>27)x.font="bold 22px Georgia";
-let ty=105;for(const line of wrap(x,title,440)){x.fillText(line,30,ty);ty+=34}
-x.fillStyle="#655b4a";x.font="15px monospace";x.fillText(d[1].slice(0,42),30,ty+14);x.fillRect(30,ty+30,450,1);
-x.fillStyle="#37362e";x.font="21px Georgia";let y=ty+77;for(const para of d[2].split("\n")){if(!para.trim()){y+=18;continue}for(const line of wrap(x,para,445)){if(y>555)break;x.fillText(line,30,y);y+=30}y+=9;if(y>555)break}
-x.font="14px monospace";x.fillStyle="#806b4c";x.fillText("ОСМОТРЕТЬ / ПЕРЕВЕРНУТЬ",30,603);
+const documentKinds=[
+["report","log","photo","email","letter","blueprint"],
+["letter","report","email","log","report","blueprint"],
+["report","log","photo","log","letter","report"],
+["report","email","blueprint","letter","log","report"]
+];
+function textureFor(d,i,chapter,back=false){
+const kind=documentKinds[chapter][i],c=document.createElement("canvas");c.width=640;c.height=840;const x=c.getContext("2d");
+const base={report:"#dfd2b4",log:"#d1d1b6",photo:"#d5d0c5",email:"#dce1db",letter:"#e9d6b7",blueprint:"#2a4558"}[kind],ink=kind==="blueprint"?"#dce6e6":"#302e27";
+x.fillStyle=base;x.fillRect(0,0,640,840);
+if(kind==="blueprint"){x.strokeStyle="#7da4b13b";x.lineWidth=1;for(let p=0;p<840;p+=26){x.beginPath();x.moveTo(0,p);x.lineTo(640,p);x.stroke()}for(let p=0;p<640;p+=26){x.beginPath();x.moveTo(p,0);x.lineTo(p,840);x.stroke()}}
+else{for(let n=0;n<2200;n++){x.fillStyle="rgba(71,51,30,"+(Math.random()*.045)+")";x.fillRect(Math.random()*640,Math.random()*840,2,2)}}
+if(kind==="log"||kind==="letter"){x.strokeStyle="#947e5940";for(let p=235;p<790;p+=36){x.beginPath();x.moveTo(28,p);x.lineTo(610,p);x.stroke()}}
+x.fillStyle=ink;x.font="bold 18px monospace";x.fillText("ДЕЛО №308   /   "+String(chapter+1).padStart(2,"0")+"—"+String(i+1).padStart(2,"0"),36,62);
+x.fillRect(36,79,568,2);
+if(kind==="photo"){x.fillStyle="#505a59";x.fillRect(46,107,548,175);x.fillStyle="#adb9b4";x.fillRect(58,119,524,151);x.fillStyle="#283a3b";for(let n=0;n<9;n++){x.fillRect(66+n*58,132+((n*29)%75),26,115-((n*11)%65))}x.fillStyle="#f1eee0";x.font="bold 16px monospace";x.fillText("КАМЕРА 04 / КАДР 21:39:12",70,257)}
+if(kind==="blueprint"){x.strokeStyle="#dce6e6";x.lineWidth=5;x.strokeRect(125,112,380,176);x.beginPath();x.moveTo(315,112);x.lineTo(315,288);x.moveTo(125,200);x.lineTo(505,200);x.stroke();x.font="bold 24px monospace";x.fillText("B2",350,175)}
+if(kind==="email"){x.fillStyle="#5d7468";x.font="bold 15px monospace";x.fillText("MAIL SERVER / ИСХОДЯЩЕЕ",40,127);x.fillText("ОТПРАВИТЕЛЬ: HOTEL TERMINAL",40,156)}
+const headingY=kind==="photo"||kind==="blueprint"?335:kind==="email"?225:155;
+x.fillStyle=ink;x.font="bold 39px Georgia";let ty=headingY;for(const line of wrap(x,d[0],550)){x.fillText(line,38,ty);ty+=45}
+x.font="17px monospace";x.fillText((back?"ОБОРОТ / ":"ЛИЦЕВАЯ / ")+d[1].slice(0,40),38,ty+10);
+x.globalAlpha=.5;x.fillRect(38,ty+28,564,2);x.globalAlpha=1;
+x.font=kind==="log"?"23px monospace":"25px Georgia";let y=ty+82;
+const body=back?d[3]:d[2];for(const para of body.split("\n")){if(!para.trim()){y+=18;continue}for(const line of wrap(x,para,555)){if(y>740)break;x.fillText(line,38,y);y+=36}y+=12;if(y>740)break}
+x.strokeStyle=ink;x.globalAlpha=.35;x.lineWidth=3;x.beginPath();x.arc(535,738,43,0,Math.PI*2);x.stroke();x.globalAlpha=.7;x.font="bold 14px monospace";x.fillText("АРХИВ",510,735);x.fillText("308",521,755);x.globalAlpha=1;
+x.font="14px monospace";x.fillText("17.11.2026 / "+(back?"ОБОРОТ":"ЛИЦО")+" / "+(i+1)+" ИЗ 6",38,802);
 const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return tex
 }
 function wrap(x,s,w){const out=[];let line="";for(const word of s.split(/\s+/)){const next=line?line+" "+word:word;if(x.measureText(next).width>w&&line){out.push(line);line=word}else line=next}if(line)out.push(line);return out}
 function mesh(w,h,d,color,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color,roughness:.86}));m.position.set(x,y,z);m.receiveShadow=true;m.castShadow=true;scene.add(m);return m}
 function resize(){if(!ready||!surface.classList.contains("webglMode"))return;const w=stage.clientWidth,h=stage.clientHeight;if(w<10||h<10)return;camera.aspect=w/h;camera.fov=w<550?58:43;camera.position.set(0,w<550?7.7:6.4,w<550?8.2:8.5);camera.lookAt(0,0,0);camera.updateProjectionMatrix();renderer.setSize(w,h,false)}
-function clearPapers(){for(const p of papers){scene.remove(p);p.geometry.dispose();p.material.map?.dispose();p.material.dispose()}papers=[]}
-function update(){if(!ready)return;clearPapers();const {chapter,seen}=window.delo308.getState(),docs=window.delo308.getChapters()[chapter].docs;
-docs.forEach((d,i)=>{const tex=textureFor(d,i,chapter),mat=new THREE.MeshStandardMaterial({map:tex,roughness:.92,side:THREE.DoubleSide});const p=new THREE.Mesh(new THREE.PlaneGeometry(2.15,2.75),mat);p.rotation.x=-Math.PI/2;p.rotation.z=[-.08,.05,-.04,.07,-.06,.03][i];const saved=window.delo308.getState().positions?.[chapter]?.[i]||{};p.position.set(slots[i][0]+(saved.x||0)/75,.04+i*.006,slots[i][1]+(saved.y||0)/75);p.userData.index=i;p.userData.chapter=chapter;p.castShadow=true;p.receiveShadow=true;scene.add(p);papers.push(p)});resize()}
+function clearPapers(){for(const p of papers){scene.remove(p);p.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){for(const mat of Array.isArray(o.material)?o.material:[o.material]){mat.map?.dispose();mat.dispose()}}})}papers=[]}
+function update(){if(!ready)return;clearPapers();const {chapter}=window.delo308.getState(),docs=window.delo308.getChapters()[chapter].docs;
+docs.forEach((d,i)=>{
+const group=new THREE.Group(),front=textureFor(d,i,chapter),back=textureFor(d,i,chapter,true);
+const edgeMat=new THREE.MeshStandardMaterial({color:"#b2a286",roughness:1});
+const block=new THREE.Mesh(new THREE.BoxGeometry(2.15,.028,2.75),edgeMat);block.castShadow=true;block.receiveShadow=true;group.add(block);
+const face=new THREE.Mesh(new THREE.PlaneGeometry(2.13,2.73),new THREE.MeshStandardMaterial({map:front,roughness:.96,side:THREE.DoubleSide}));face.rotation.x=-Math.PI/2;face.position.y=.016;group.add(face);
+const reverse=new THREE.Mesh(new THREE.PlaneGeometry(2.13,2.73),new THREE.MeshStandardMaterial({map:back,roughness:.96,side:THREE.DoubleSide}));reverse.rotation.x=Math.PI/2;reverse.position.y=-.016;group.add(reverse);
+const saved=window.delo308.getState().positions?.[chapter]?.[i]||{};
+group.position.set(slots[i][0]+(saved.x||0)/75,.04+i*.006,slots[i][1]+(saved.y||0)/75);
+group.rotation.y=[-.08,.05,-.04,.07,-.06,.03][i];
+group.userData.index=i;group.userData.chapter=chapter;group.traverse(o=>{if(o.isMesh)o.userData.index=i});
+scene.add(group);papers.push(group)
+});resize()}
 function setLamp(v){if(light)light.intensity=v?110:9}
 function setMode(v){if(v&&!ready){window.delo308.getState().view3d=false;surface.classList.remove("webglMode");stage.hidden=true;alert("3D пока недоступен. Используй 2D стол.");return}surface.classList.toggle("webglMode",!!v);stage.hidden=!v;if(v){resize();if(!raf)animate()}else if(raf){cancelAnimationFrame(raf);raf=0}}
 function animate(){raf=requestAnimationFrame(animate);if(renderer&&surface.classList.contains("webglMode"))renderer.render(scene,camera)}
-function pointerTarget(e){const b=stage.getBoundingClientRect();mouse.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);raycaster.setFromCamera(mouse,camera);return raycaster.intersectObjects(papers)[0]}
+function pointerTarget(e){const b=stage.getBoundingClientRect();mouse.set((e.clientX-b.left)/b.width*2-1,-(e.clientY-b.top)/b.height*2+1);raycaster.setFromCamera(mouse,camera);return raycaster.intersectObjects(papers,true)[0]}
 function bindInput(){
 stage.addEventListener("pointerdown",e=>{if(e.button!==0||!ready)return;const hit=pointerTarget(e);if(!hit)return;const obj=hit.object;drag={id:e.pointerId,i:obj.userData.index,x:e.clientX,y:e.clientY,moved:false,startX:obj.position.x,startZ:obj.position.z};stage.setPointerCapture(e.pointerId);status.textContent="ДОКУМЕНТ "+(drag.i+1)+" / "+window.delo308.getChapters()[window.delo308.getState().chapter].docs[drag.i][0]});
-stage.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>8)drag.moved=true;if(drag.moved){const p=papers[drag.i];if(p){const w=stage.clientWidth,h=stage.clientHeight;p.position.x=Math.max(-3.55,Math.min(3.55,drag.startX+dx/Math.max(w,1)*9));p.position.z=Math.max(-2.45,Math.min(2.45,drag.startZ+dy/Math.max(h,1)*8));p.position.y=.24;p.rotation.z=Math.sin(dx*.004)*.13}}});
-stage.addEventListener("pointerup",e=>{if(!drag||e.pointerId!==drag.id)return;const {i,moved}=drag;drag=null;const p=papers[i];if(moved&&p){p.position.y=.05+i*.006;p.rotation.z=0;const s=window.delo308.getState();if(!Array.isArray(s.positions))s.positions=[{},{},{},{}];if(!s.positions[s.chapter])s.positions[s.chapter]={};s.positions[s.chapter][i]={x:Math.round((p.position.x-slots[i][0])*75),y:Math.round((p.position.z-slots[i][1])*75)};window.delo308.persist();status.textContent="ПОЛОЖЕНИЕ СОХРАНЕНО"}else if(!moved){window.delo308.openDoc(i);status.textContent="ОТКРЫТ ДОКУМЕНТ "+(i+1)}});
+stage.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>8)drag.moved=true;if(drag.moved){const p=papers[drag.i];if(p){const w=stage.clientWidth,h=stage.clientHeight;p.position.x=Math.max(-3.55,Math.min(3.55,drag.startX+dx/Math.max(w,1)*9));p.position.z=Math.max(-2.45,Math.min(2.45,drag.startZ+dy/Math.max(h,1)*8));p.position.y=.24;p.rotation.y=Math.sin(dx*.004)*.13}}});
+stage.addEventListener("pointerup",e=>{if(!drag||e.pointerId!==drag.id)return;const {i,moved}=drag;drag=null;const p=papers[i];if(moved&&p){p.position.y=.05+i*.006;p.rotation.y=[-.08,.05,-.04,.07,-.06,.03][i];const s=window.delo308.getState();if(!Array.isArray(s.positions))s.positions=[{},{},{},{}];if(!s.positions[s.chapter])s.positions[s.chapter]={};s.positions[s.chapter][i]={x:Math.round((p.position.x-slots[i][0])*75),y:Math.round((p.position.z-slots[i][1])*75)};window.delo308.persist();status.textContent="ПОЛОЖЕНИЕ СОХРАНЕНО"}else if(!moved){window.delo308.openDoc(i);status.textContent="ОТКРЫТ ДОКУМЕНТ "+(i+1)}});
 stage.addEventListener("pointercancel",()=>{if(drag&&papers[drag.i]){papers[drag.i].position.y=.05+drag.i*.006}drag=null});
 stage.addEventListener("keydown",e=>{if(e.key==="Escape")drag=null});
 }
