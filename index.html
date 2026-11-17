@@ -7,9 +7,44 @@
 #intro{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at center,#3d3022,#0b0d0b 75%);display:grid;place-items:center;text-align:center;padding:20px}#intro h1{font-size:clamp(48px,8vw,105px);font-weight:normal;margin:10px}#intro p{max-width:620px;font-size:20px;line-height:1.5;color:#c6b79a}#intro .over{font:11px monospace;letter-spacing:4px;color:#c9a46d}.hidden{display:none!important}#soundSettings{position:fixed;z-index:45;right:12px;bottom:76px;background:#182019;border:1px solid #9a805e;padding:18px;box-shadow:0 10px 35px #000c;width:min(320px,90vw);font:12px monospace}#soundSettings label{display:block;margin:12px 0}#soundSettings input{width:100%}#conclusionBox{max-width:780px;margin:40px auto;padding:26px;background:#d7c8a6;color:#2f2519}#conclusionBox h3{font-size:32px;font-weight:normal}#conclusionBox select,#conclusionBox input{display:block;width:100%;padding:10px;margin:8px 0 18px;background:#eee3ca;border:1px solid #988366;color:#2d2419}#conclusionBox p{line-height:1.7}#result{font-size:18px;line-height:1.5;color:#5a382a}
 @media(max-width:700px){#head{height:59px;padding:0 10px}#head strong{font-size:17px}#head small{font-size:7px;letter-spacing:1px}#time{font-size:12px}#chapterName{font-size:10px}#mat{left:3%;right:3%;top:15%;bottom:12%;border-width:6px}#cup{width:40px;height:40px;border-width:6px}#cup:after{left:27px;top:4px;width:14px;height:17px;border-width:5px}#pencil{height:80px;right:3%}#light{width:130px;height:130px;right:-40px;top:0}#tip{top:66px;font-size:9px;max-width:85%}#controls{gap:4px}.btn{font-size:10px;padding:10px 7px}#cork{border-width:7px}.clue{width:105px;min-height:90px;font-size:10px}.panelhead h2{font-size:24px}.panelhead p{font-size:10px}.inspectbox{max-height:90dvh;padding:26px 16px}.sheet .body{font-size:18px}#intro p{font-size:17px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Director's cut: cinematic lighting, desk depth, and physical inspection */
+#game{background:repeating-linear-gradient(90deg,#25190f 0 2px,#3c291a 3px 130px,#24180f 132px 135px,#382719 138px 260px);isolation:isolate}
+#game:after{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 76% 11%,#e9bc6840 0%,#d1a36618 24%,transparent 57%),radial-gradient(ellipse at 50% 54%,transparent 40%,#0009 100%);mix-blend-mode:screen}
+#mat{background:radial-gradient(ellipse at 72% 8%,#4b6047 0%,#2d4634 40%,#17291f 80%);border-color:#26372c;box-shadow:0 23px 12px #0008,0 32px 44px #0008,inset 0 0 0 3px #a98b5738,inset 0 0 90px #0008}
+#mat:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.17;background:repeating-linear-gradient(35deg,transparent 0 2px,#c2b98d22 3px 4px,transparent 5px 8px)}
+.object{filter:drop-shadow(1px 3px 3px #0008);will-change:transform;transition:filter .15s,scale .15s}
+.object:hover{scale:1.035;filter:brightness(1.08) drop-shadow(0 9px 10px #000b)}
+.object.dragging{scale:1.09;filter:brightness(1.13) drop-shadow(0 22px 20px #000b)}
+.object.paper{background:linear-gradient(110deg,#e7d7b7,#e9dcbf 35%,#d4c09a);border-radius:1px;box-shadow:4px 8px 1px #9e886b55,8px 13px 18px #0009,inset 0 0 35px #7c5d3322}
+.object.paper:nth-child(3n){background:linear-gradient(130deg,#e2d6b9,#c9c9b3);border-top:5px solid #6c796d}
+.object.paper:nth-child(4n){background:linear-gradient(130deg,#e9e2cf,#d0c8ae);border-left:6px solid #7e4035}
+.object.paper:nth-child(5n){background:linear-gradient(120deg,#cad5cc,#aabeb8);color:#1f3333}
+.object h3{line-height:1.12;font-size:clamp(16px,1.5vw,21px)}
+.object .kicker{font-size:8px;font-weight:bold;line-height:1.4}
+.object p{font-family:Georgia,serif}
+#inspect{perspective:1300px}
+.inspectbox{border-radius:2px;transform-style:preserve-3d;box-shadow:0 40px 130px #000e,12px 10px 0 #a58b6650,inset 0 0 90px #6c513c30}
+.inspectbox:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.19;background:repeating-linear-gradient(2deg,transparent 0 3px,#7b604d19 4px,transparent 5px 11px)}
+.inspectbox.flip{animation:turn .45s ease-in-out}
+.sheet .body{letter-spacing:.1px;max-width:650px}
+#light{box-shadow:0 10px 38px #000c,0 0 110px 40px #e9c47d24}
+#tip{background:#11180fba;padding:8px 12px;border:1px solid #aa906034;max-width:420px;line-height:1.5}
+#inspect .inspectActions{position:sticky;bottom:-18px;background:#d6c6a7ef;padding:12px 0 0}
+#deskHands{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
+#deskHands:before,#deskHands:after{content:"";position:absolute;bottom:-75px;width:110px;height:190px;border-radius:50% 50% 15% 15%;opacity:.17;filter:blur(12px);background:#c4a17b}
+#deskHands:before{left:15%;transform:rotate(-24deg)}#deskHands:after{right:15%;transform:rotate(24deg)}
+#investigationPulse{position:fixed;z-index:33;top:76px;right:16px;background:#1b291f;color:#e9d8b5;border:1px solid #c7a472;padding:11px 15px;font:11px monospace;box-shadow:0 10px 35px #0009;max-width:min(360px,80vw);transition:opacity .3s}
+#investigationPulse.hidden{display:none}
+#focusLamp{position:fixed;z-index:29;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(circle at 50% 50%,#ffecb31c,transparent 60%)}
+#focusLamp.on{opacity:1}
+#docBody::selection{background:#a67b4b80}
+#chapterName{letter-spacing:1px}
+#head{backdrop-filter:blur(8px)}
+@media(max-width:700px){#mat{top:17%;bottom:13%}.object h3{font-size:15px}.object p{font-size:9px}#tip{top:63px;left:7px;font-size:9px;max-width:95%}#controls{justify-content:space-around}.btn{min-height:38px}#investigationPulse{top:67px;right:5px;font-size:10px}.inspectbox{padding:24px 19px}}
 </style></head><body>
-<div id="game"><div id="mat"></div><div id="light"></div><div id="cup"></div><div id="pencil"></div><div id="objects"></div><header id="head"><div><strong>Последний гость</strong><small>АРХИВ / ДЕЛО №308</small></div><div><span id="time">22:20</span> <span id="chapterName">/ 17 НОЯБРЯ</span></div><button class="btn" id="soundButton">ЗВУК ◌</button></header><div id="tip">Перетащи бумагу. Нажми на неё, чтобы взять в руки.</div><nav id="controls"><button class="btn" id="chaptersButton">ПАПКИ</button><button class="btn" id="boardButton">ДОСКА СВЯЗЕЙ</button><button class="btn" id="notesButton">БЛОКНОТ</button><button class="btn" id="compareButton">СРАВНИТЬ (0/2)</button><button class="btn" id="spreadButton">РАЗЛОЖИТЬ</button><button class="btn gold" id="deduceButton">СДЕЛАТЬ ВЫВОД →</button></nav></div>
-<div id="inspect" class="hidden"><article class="inspectbox" id="inspectbox"><button class="x" id="closeInspect">×</button><div class="sheet" id="sheet"><div class="kicker" id="docType"></div><h2 id="docTitle"></h2><div class="meta" id="docMeta"></div><div class="body" id="docBody"></div></div><div class="inspectActions"><button class="ink" id="flip">↻ ПЕРЕВЕРНУТЬ</button><button class="ink" id="lens">＋ ЛУПА</button><button class="ink hidden" id="backlight">☼ НА СВЕТ</button><button class="ink dark" id="pin">＋ НА ДОСКУ</button><button class="ink" id="compare">⇄ СРАВНИТЬ</button><button class="ink" id="next">СЛЕДУЮЩИЙ →</button></div></article></div>
+<div id="game"><div id="mat"></div><div id="light"></div><div id="cup"></div><div id="pencil"></div><div id="objects"></div><div id="deskHands"></div><header id="head"><div><strong>Последний гость</strong><small>АРХИВ / ДЕЛО №308</small></div><div><span id="time">22:20</span> <span id="chapterName">/ 17 НОЯБРЯ</span></div><button class="btn" id="soundButton">ЗВУК ◌</button></header><div id="tip">Перетащи бумагу. Нажми на неё, чтобы взять в руки.</div><nav id="controls"><button class="btn" id="chaptersButton">ПАПКИ</button><button class="btn" id="boardButton">ДОСКА СВЯЗЕЙ</button><button class="btn" id="notesButton">БЛОКНОТ</button><button class="btn" id="compareButton">СРАВНИТЬ (0/2)</button><button class="btn" id="spreadButton">РАЗЛОЖИТЬ</button><button class="btn gold" id="deduceButton">СДЕЛАТЬ ВЫВОД →</button></nav></div>
+<div id="focusLamp"></div><div id="investigationPulse" class="hidden" aria-live="polite"></div><div id="inspect" class="hidden"><article class="inspectbox" id="inspectbox"><button class="x" id="closeInspect">×</button><div class="sheet" id="sheet"><div class="kicker" id="docType"></div><h2 id="docTitle"></h2><div class="meta" id="docMeta"></div><div class="body" id="docBody"></div></div><div class="inspectActions"><button class="ink" id="flip">↻ ПЕРЕВЕРНУТЬ</button><button class="ink" id="lens">＋ ЛУПА</button><button class="ink hidden" id="backlight">☼ НА СВЕТ</button><button class="ink dark" id="pin">＋ НА ДОСКУ</button><button class="ink" id="compare">⇄ СРАВНИТЬ</button><button class="ink" id="next">СЛЕДУЮЩИЙ →</button></div></article></div>
 <section id="board" class="hidden"><div class="panelhead"><div><h2>Доска связей</h2><p>Закрепи документы. Нажми на две карточки, чтобы протянуть красную нить. Перетаскивай карточки.</p></div><button class="btn" id="boardClose">← СТОЛ</button></div><div id="cork"><svg id="strings"></svg><div id="clues"></div></div><div id="boardMsg"></div><button class="btn" id="undoLink">УДАЛИТЬ ПОСЛЕДНЮЮ СВЯЗЬ</button></section>
 <section id="notebook" class="hidden"><div id="notepage"><h2>Блокнот следователя</h2><textarea id="notes" placeholder="Что здесь не сходится? Записывай свои версии..."></textarea><button class="ink dark" id="notesClose">ЗАКРЫТЬ</button><button class="ink" id="saveExport">ЭКСПОРТ СОХРАНЕНИЯ</button><button class="ink" id="saveImport">ИМПОРТ</button><input id="saveFile" type="file" accept=".json" hidden></div></section>
 <section id="casePanel" class="hidden"><div class="panelhead"><div><h2>Архив дела №308</h2><p>Четыре папки. Каждая следующая открывается после обоснованного вывода.</p></div><button class="btn" id="caseClose">← СТОЛ</button></div><div class="cases" id="caseCards"></div><div id="conclusionBox" class="hidden"><h3 id="questionTitle"></h3><p id="questionText"></p><label>Первый вывод<select id="answer1"></select></label><label>Второй вывод<select id="answer2"></select></label><button class="ink dark" id="submitTheory">ПРОВЕРИТЬ ВЕРСИЮ</button><p id="result"></p></div></section>
@@ -78,4 +113,59 @@ $('#submitTheory').onclick=()=>{const c=chapters[state.chapter],a=+$('#answer1')
 const origOpen=openDoc;openDoc=function(d){origOpen(d);if(d.title==='Конверт диспетчерской'&&!state.openedEnvelope){const code=prompt('Конверт запечатан. Введи четыре цифры проекта из банковской выписки:');if(code==='0714'){state.openedEnvelope=true;persist();$('#docBody').textContent='ПЕЧАТЬ ВСКРЫТА\n\nC-17 / ДВОР «БЕРЕГА» / 00:10\nСКЛАД 4 / УТИЛИЗАЦИЯ В 06:00';fx('flip')}else if(code!==null){$('#docBody').textContent='Конверт остался запечатан. Ищи назначение платежа за логистику.'}}};
 $('#saveExport').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='delo308-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};$('#saveImport').onclick=()=>$('#saveFile').click();$('#saveFile').onchange=async e=>{try{const s=JSON.parse(await e.target.files[0].text());if(!Array.isArray(s.pins)||!Array.isArray(s.links))throw Error();state={...state,...s};persist();renderDesk();alert('Прогресс загружен')}catch(e){alert('Файл сохранения не распознан')}};
 $('#start').onclick=()=>{state.started=true;persist();$('#intro').classList.add('hidden');renderDesk()};if(state.started)$('#intro').classList.add('hidden');renderDesk();addEventListener('resize',()=>{renderDesk();if(!$('#board').classList.contains('hidden'))drawStrings()});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeInspect();closePanels();$('#soundSettings').classList.add('hidden')}})
+
+/* Director's cut: feedback, readable clues, realistic interactions and guided deduction */
+(function(){
+const pulse=document.getElementById('investigationPulse');
+let pulseTimer=0;
+function notify(message){pulse.textContent=message;pulse.classList.remove('hidden');clearTimeout(pulseTimer);pulseTimer=setTimeout(()=>pulse.classList.add('hidden'),3400)}
+function paperSound(){if(typeof fx==='function')fx('flip')}
+const originalOpen=openDoc;
+openDoc=function(doc){originalOpen(doc);notify('Материал изучен: '+doc.title+'. Проверь оборот и детали.');};
+const origPaint=paintDoc;
+paintDoc=function(){origPaint();if(!current)return;const b=document.getElementById('docBody');b.style.cursor='text';b.title='Выдели важную строку и добавь её в блокнот';};
+const actions=document.querySelector('.inspectActions');
+const mark=document.createElement('button');mark.className='ink';mark.id='markQuote';mark.textContent='✎ ВЫПИСАТЬ ФРАГМЕНТ';mark.title='Выдели текст в документе и сохрани в блокнот';actions.appendChild(mark);
+mark.onclick=()=>{
+if(!current)return;
+let quote=window.getSelection()?.toString().trim()||'';
+if(!quote)quote=(flipped?current.back:current.front).split('\n').filter(Boolean)[0]||current.title;
+quote=quote.slice(0,420);
+state.notes=(state.notes||'')+'\n\n['+current.title+'] '+quote;
+persist();paperSound();notify('Фрагмент перенесён в блокнот следователя');
+};
+const close=document.getElementById('closeInspect');
+const oldClose=close.onclick;close.onclick=()=>{oldClose();document.getElementById('focusLamp').classList.remove('on')};
+const lightButton=document.getElementById('backlight');
+lightButton.addEventListener('click',()=>{document.getElementById('focusLamp').classList.toggle('on',light);if(light)notify('На просвет видны следы исправления номера: 17 → 71')});
+const oldPin=document.getElementById('pin').onclick;
+document.getElementById('pin').onclick=()=>{oldPin();notify('Документ закреплён на доске. Теперь можно связать его с другими уликами.')};
+const oldCompare=document.getElementById('compare').onclick;
+document.getElementById('compare').onclick=()=>{oldCompare();if(compare.length===1)notify('Выбран первый документ. Найди второй для сравнения.')};
+const oldDeduce=document.getElementById('deduceButton').onclick;
+document.getElementById('deduceButton').onclick=()=>{
+oldDeduce();
+const seen=docs[state.chapter].filter(d=>state.seen[d.id]).length;
+if(seen<3)notify('Прочитано '+seen+' из '+docs[state.chapter].length+' документов. Не спеши с выводами.');
+};
+const oldSubmit=document.getElementById('submitTheory').onclick;
+document.getElementById('submitTheory').onclick=()=>{
+const seen=docs[state.chapter].filter(d=>state.seen[d.id]).length;
+if(seen<4){document.getElementById('result').textContent='Версия преждевременна. Для обоснованного вывода изучи хотя бы четыре документа текущей папки.';notify('Нужно изучить ещё '+(4-seen)+' материала.');return}
+oldSubmit();
+};
+const oldBoard=document.getElementById('boardButton').onclick;
+document.getElementById('boardButton').onclick=()=>{oldBoard();if(state.pins.length<2)document.getElementById('boardMsg').textContent='Для красной нити нужны хотя бы два документа. Возьми бумаги со стола и закрепи их здесь.'};
+const oldStart=document.getElementById('start').onclick;
+document.getElementById('start').onclick=()=>{oldStart();notify('Дело открыто. Нажми на документ, чтобы поднять его со стола.');};
+document.getElementById('tip').textContent='Бумаги можно двигать. Нажми, чтобы взять в руки; переверни и изучи оборот.';
+const help=document.createElement('button');help.className='btn';help.textContent='?';help.setAttribute('aria-label','Как играть');document.getElementById('head').appendChild(help);
+help.onclick=()=>alert('УПРАВЛЕНИЕ\n\n1. Перетаскивай документы мышью или пальцем.\n2. Нажми на лист, чтобы взять в руки.\n3. Переверни его, включи лупу или просвет.\n4. Выдели важный текст и выпиши его в блокнот.\n5. Закрепляй документы на доске и соединяй улики.\n6. Сравнивай материалы и делай выводы.\n7. В меню «ЗВУК» включи дождь и звуки бумаги.\n\nПрогресс сохраняется автоматически.');
+const audioSettings=document.getElementById('soundSettings');
+audioSettings.insertAdjacentHTML('afterbegin','<p style="line-height:1.6;color:#c5b493">Звук включается после нажатия кнопки. Для наушников рекомендуем окружение 35%, эффекты 45%.</p>');
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'&&!document.getElementById('inspect').classList.contains('hidden'))document.getElementById('next').click();
+if(e.key.toLowerCase()==='f'&&!document.getElementById('inspect').classList.contains('hidden'))document.getElementById('flip').click();
+});
+})();
 </script></body></html>
