@@ -269,7 +269,30 @@ $("#return").onclick=()=>{$("#ending").hidden=true;$("#game").hidden=false;state
 document.addEventListener("keydown",e=>{if(!$("#reader").hidden&&!["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)){if(e.key==="ArrowLeft"){e.preventDefault();if(state.selected>0)openDoc(state.selected-1)}if(e.key==="ArrowRight"){e.preventDefault();if(state.selected<5)openDoc(state.selected+1)}if(e.key.toLowerCase()==="f"){e.preventDefault();$("#flip").click()}}if(e.key==="Escape"){$("#reader").hidden=true;$("#deduction").hidden=true;$("#puzzle").hidden=true;$("#caseboard").hidden=true;$("#settings").hidden=true;$("#notebook").hidden=true;$("#chronologyPanel").hidden=true}});
 $("#audioButton").textContent=state.sound?"● ЗВУК ВКЛЮЧЁН":"◌ ВКЛЮЧИТЬ ЗВУК";applySettings();render();if(!state.started)$("#introOverlay").hidden=false;window.delo308={getState:()=>state,getChapters:()=>chapters,openDoc,escapeHTML,persist:save};
 </script>
-<script type="module">
+<script>
+/* Emergency first-paint recovery: preserve a playable 2D desk if the legacy init fails. */
+(function(){
+function recover(){
+const title=document.getElementById("chapterTitle"),papers=document.getElementById("papers");
+if(!title||!papers)return;
+if(title.textContent.trim()&&papers.children.length)return;
+console.warn("Archive 308: recovering 2D first paint");
+let chapter;
+try{chapter=chapters[0]}catch(e){return}
+title.textContent=chapter.title;
+const n=document.getElementById("chapterNumber");if(n)n.textContent="ГЛАВА I / 4";
+const intro=document.getElementById("intro");if(intro)intro.textContent=chapter.intro;
+const time=document.getElementById("time");if(time)time.textContent="17.11.2026 · "+chapter.time;
+const progress=document.getElementById("progress");if(progress)progress.textContent="ДОКУМЕНТОВ: "+chapter.docs.length;
+const surface=document.getElementById("deskSurface"),stage=document.getElementById("webglStage");
+surface?.classList.remove("webglMode");if(stage)stage.hidden=true;
+papers.innerHTML="";
+chapter.docs.forEach((d,i)=>{const b=document.createElement("button");b.className="paper";b.style.setProperty("--r",([-3,2,-1,3,-2,1][i])+"deg");const sm=document.createElement("small"),h=document.createElement("b"),p=document.createElement("span"),em=document.createElement("i");sm.textContent=d[1];h.textContent=d[0];p.textContent=d[2].slice(0,110)+"…";em.textContent="ОСМОТРЕТЬ →";b.append(sm,h,p,em);b.onclick=()=>{const reader=document.getElementById("reader");if(!reader)return;const dt=document.getElementById("docTitle"),body=document.getElementById("docBody"),meta=document.getElementById("docMeta"),flip=document.getElementById("flip");if(dt)dt.textContent=d[0];if(body)body.textContent=d[2];if(meta)meta.textContent=d[1];if(flip)flip.onclick=()=>{const back=body.textContent===d[2];body.textContent=back?d[3]:d[2];flip.textContent=back?"↻ ЛИЦЕВАЯ СТОРОНА":"↻ ПЕРЕВЕРНУТЬ"};reader.hidden=false};papers.appendChild(b)});
+const notice=document.getElementById("v02ThreeNotice");if(notice){notice.hidden=false;notice.textContent="Восстановлен 2D-режим. Если проблема повторится, сообщите разработчику."}
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(recover,350));else setTimeout(recover,350);
+})();
+</script><script type="module">
 const stage=document.getElementById("webglStage"),surface=document.getElementById("deskSurface");
 let THREE,renderer,scene,camera,light,raycaster,mouse,papers=[],raf=0,drag=null,ready=false,ground,dragPlane;const status=document.getElementById("webglStatus");
 let cameraScale=1;const slots=[[-2.5,-1.3],[-.05,-1.4],[2.4,-1.2],[-2.5,1.1],[.05,1.1],[2.45,1.2]];
