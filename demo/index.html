@@ -357,4 +357,62 @@ window.update3dDesk=update;window.set3dMode=setMode;window.set3dLamp=setLamp;sta
 if(window.delo308.getState().view3d)setMode(true);
 new ResizeObserver(resize).observe(stage);
 }catch(e){console.warn("3D scene unavailable",e);window.set3dMode=()=>{alert("3D-сцена не загрузилась. Доступен полноценный 2D-режим.");window.delo308.getState().view3d=false};window.delo308.getState().view3d=false;status.textContent="3D / НЕДОСТУПНО"}
-</script></body></html>
+</script>
+<style>
+/* v0.2: game controls and preferences occupy separate surfaces */
+.v02-quick{position:fixed;right:15px;bottom:15px;z-index:19;display:flex;gap:8px;align-items:center;padding:9px;background:#14231fe8;border:1px solid #8d7958;box-shadow:0 8px 32px #0009;border-radius:9px;backdrop-filter:blur(10px)}
+.v02-quick button{background:#314237;color:#f0ddba;border:1px solid #897451;border-radius:5px;min-height:42px;padding:9px 12px;font:12px monospace;cursor:pointer}
+.v02-quick button:focus-visible{outline:3px solid #eacb8d}
+.v02-quick button.v02-config{font-size:19px;min-width:43px}
+.v02-tour{position:fixed;inset:0;z-index:90;background:#080e0cdb;display:grid;place-items:center;padding:16px;overflow:auto}
+.v02-tour[hidden]{display:none}
+.v02-tour-panel{background:#1c2b23;border:1px solid #b49766;box-shadow:0 25px 90px #000c;width:min(570px,100%);padding:clamp(22px,5vw,43px);color:#e8dac0}
+.v02-tour-panel small{font:11px monospace;letter-spacing:2px;color:#bca27c}
+.v02-tour-panel h2{font-size:clamp(27px,6vw,43px);font-weight:normal;margin:13px 0}
+.v02-tour-panel p{font:18px/1.7 Georgia;margin:14px 0 22px}
+.v02-tour-panel .v02-steps{display:flex;gap:5px;margin:22px 0}
+.v02-tour-panel .v02-steps i{height:3px;flex:1;background:#46594c}
+.v02-tour-panel .v02-steps i.active{background:#d2ad77}
+.v02-tour-actions{display:flex;gap:10px;flex-wrap:wrap}
+.v02-tour-actions button{min-height:44px;padding:11px 15px;border:1px solid #a48a64;background:#d4b98a;color:#1b261f;font:12px monospace;cursor:pointer}
+.v02-tour-actions button.secondary{background:transparent;color:#e5d4b6}
+@media(max-width:650px){.v02-quick{left:9px;right:9px;bottom:7px;justify-content:space-between;padding:6px}.v02-quick button{font-size:10px;padding:8px;flex:1}.v02-quick button.v02-config{flex:0 0 42px}.app{padding-bottom:120px}}
+</style>
+<div class="v02-quick" role="group" aria-label="Быстрые игровые инструменты">
+<button id="v02Light" title="Включить или выключить лампу">◉ СВЕТ</button>
+<button id="v02Inspect" title="Исследовать вещественное доказательство">▣ УЛИКА</button>
+<button id="v02Notebook" title="Открыть блокнот следователя">▤ ЗАПИСИ</button>
+<button id="v02Guide" title="Как играть">? ПОМОЩЬ</button>
+<button class="v02-config" id="v02Settings" title="Настройки изображения, звука и текста" aria-label="Настройки">⚙</button>
+</div>
+<div id="v02Tour" class="v02-tour" hidden role="dialog" aria-modal="true" aria-labelledby="v02TourTitle">
+<section class="v02-tour-panel"><small id="v02TourCounter"></small><h2 id="v02TourTitle"></h2><p id="v02TourText"></p><div class="v02-steps" id="v02TourSteps" aria-hidden="true"></div>
+<div class="v02-tour-actions"><button id="v02TourNext">ПРОДОЛЖИТЬ →</button><button id="v02TourSkip" class="secondary">ПРОПУСТИТЬ</button></div></section>
+</div>
+<script>
+(function(){
+const $v=id=>document.getElementById(id);
+const guide=[
+["Вы получили дело","17 ноября, 22:20. Реставратор Антон Ветров исчез из номера 308. На столе лежат материалы, но ни одному документу нельзя верить без проверки. Ваша задача — установить, кто лжёт."],
+["Возьмите документ","Нажмите на любой лист на столе. Вы увидите лицевую сторону, дату и источник. Прочитайте внимательно: иногда важнее не содержание, а время, когда появилась запись."],
+["Осмотрите оборот","В окне документа нажмите «Перевернуть». На обороте бывают пометки, служебные сведения и детали, которые не видны на лицевой стороне. Закройте документ, чтобы вернуться к столу."],
+["Работайте со светом","Кнопка «Свет» переключает настольную лампу. Это часть атмосферы и способ по-новому рассмотреть рабочее место. Отдельная кнопка «Улика» открывает предметное исследование с собственной загадкой."],
+["Сопоставляйте источники","Используйте «Доску улик», разговор со свидетелем и хронологию. Одна улика может ошибаться; совпадение независимых источников гораздо надёжнее. Записывайте гипотезы в блокнот."],
+["Докажите версию","Когда соберёте факты, нажмите «Собрать версию». Нужно не только выбрать подозреваемого, но и указать подтверждающие документы, а также исследовать вещественную улику. Ошибка не обнуляет прогресс."]
+];
+let step=0;
+const tour=$v("v02Tour");
+function show(n){step=n;$v("v02TourCounter").textContent="ИНСТРУКТАЖ СЛЕДОВАТЕЛЯ / "+(n+1)+" ИЗ "+guide.length;$v("v02TourTitle").textContent=guide[n][0];$v("v02TourText").textContent=guide[n][1];$v("v02TourSteps").innerHTML=guide.map((_,i)=>'<i class="'+(i<=n?'active':'')+'"></i>').join("");$v("v02TourNext").textContent=n===guide.length-1?"ПРИСТУПИТЬ К ДЕЛУ →":"ДАЛЕЕ →";tour.hidden=false;$v("v02TourNext").focus()}
+function finish(){tour.hidden=true;try{localStorage.setItem("delo308_guide_v02","1")}catch(e){}}
+$v("v02TourNext").addEventListener("click",()=>step===guide.length-1?finish():show(step+1));
+$v("v02TourSkip").addEventListener("click",finish);
+$v("v02Guide").addEventListener("click",()=>show(0));
+$v("v02Light").addEventListener("click",()=>$v("lampButton")?.click());
+$v("v02Inspect").addEventListener("click",()=>$v("puzzleButton")?.click());
+$v("v02Notebook").addEventListener("click",()=>$v("notebookButton")?.click());
+$v("v02Settings").addEventListener("click",()=>$v("settingsButton")?.click());
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!tour.hidden)finish()});
+$v("startCase")?.addEventListener("click",()=>{try{if(!localStorage.getItem("delo308_guide_v02"))setTimeout(()=>show(0),150)}catch(e){}});
+})();
+</script>
+</body></html>
