@@ -1,3 +1,5 @@
+Актуальные изменения и проверки: [CHANGELOG.md](CHANGELOG.md).
+
 # RELEASE QA — Дело №308 / complete
 
 ## Реализовано в сборке

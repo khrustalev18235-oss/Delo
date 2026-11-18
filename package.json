@@ -1,0 +1,25 @@
+{
+  "name": "delo",
+  "version": "1.0.0",
+  "description": "Дело №308 — браузерное расследование",
+  "scripts": {
+    "test": "node tests/investigation.cjs",
+    "dev": "node scripts/serve.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khrustalev18235-oss/Delo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/khrustalev18235-oss/Delo/issues"
+  },
+  "homepage": "https://github.com/khrustalev18235-oss/Delo#readme",
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "three": "^0.170.0"
+  },
+  "private": true
+}
