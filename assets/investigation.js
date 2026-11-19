@@ -41,15 +41,66 @@ const secrets = {
  '2:4':'Исходная строка: М-17 / пломба 406. Поверх неё: М-71. Нижняя запись продавлена до исправления. На поле — 20:20.',
  '3:2':'Копировальный оттиск: заказ 0714 / тара C-17 / партия М-17. Отметка оператора: МК — приложений 0.'
 };
+
+/* v0.4: localized light inspection. Turning on the light alone never grants a discovery. */
+const transmitted=byId('transmittedInk');
+const beam=document.createElement('div');
+beam.className='inspectionBeam';beam.setAttribute('aria-hidden','true');
+transmitted.append(beam);
+const scanned=new Map();
+let currentScanKey='';
+function inspectAt(x,y){
+ const key=docKey();
+ if(!byId('reader').querySelector('.sheet').classList.contains('lit')||state.side!==1||!secrets[key])return;
+ const r=transmitted.getBoundingClientRect();
+ if(!r.width||!r.height)return;
+ const px=Math.max(0,Math.min(100,(x-r.left)/r.width*100));
+ const py=Math.max(0,Math.min(100,(y-r.top)/r.height*100));
+ transmitted.style.setProperty('--beam-x',px+'%');
+ transmitted.style.setProperty('--beam-y',py+'%');
+ const cells=scanned.get(key)||new Set();
+ cells.add(Math.min(3,Math.floor(px/25))+4*Math.min(2,Math.floor(py/34)));
+ scanned.set(key,cells);
+ if(cells.size>=3&&!state.discoveries[key]){
+  state.discoveries[key]=true;save();
+  byId('lightStatus').textContent='След зафиксирован в деле. Теперь его можно сопоставить с другими материалами.';
+  transmitted.classList.add('inspected');
+ }
+}
+transmitted.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||e.buttons)inspectAt(e.clientX,e.clientY)});
+transmitted.addEventListener('pointerdown',e=>{transmitted.setPointerCapture?.(e.pointerId);inspectAt(e.clientX,e.clientY)});
+transmitted.addEventListener('pointerup',e=>{if(transmitted.hasPointerCapture?.(e.pointerId))transmitted.releasePointerCapture(e.pointerId)});
+const scanAccess=document.createElement('button');scanAccess.type='button';scanAccess.className='scanAccess btn';
+scanAccess.textContent='Исследовать светом с клавиатуры';
+scanAccess.addEventListener('click',()=>{
+ const r=transmitted.getBoundingClientRect(),key=docKey();
+ if(!scanned.has(key))scanned.set(key,new Set());
+ for(const fraction of [.2,.5,.8])inspectAt(r.left+r.width*fraction,r.top+r.height*.52);
+});
+transmitted.append(scanAccess);
 updateTransmitted = function(){
  const lit=byId('reader').querySelector('.sheet').classList.contains('lit');
- const text=state.side===1?secrets[docKey()]:null;
- byId('transmittedInk').hidden=!(lit&&text);
- if(lit&&text){byId('transmittedText').textContent=text;state.discoveries[docKey()]=true;save();}
+ const key=docKey(),text=state.side===1?secrets[key]:null;
+ transmitted.hidden=!(lit&&text);
+ transmitted.classList.toggle('inspected',!!state.discoveries[key]);
+ if(currentScanKey!==key){currentScanKey=key;transmitted.style.setProperty('--beam-x','12%');transmitted.style.setProperty('--beam-y','50%');}
+ if(lit&&text)byId('transmittedText').textContent=text;
  byId('backlight').textContent=lit?'☼ Обычный свет':'☼ Просветить';
  byId('backlight').setAttribute('aria-pressed',String(lit));
- byId('lightStatus').textContent=lit?(text?'Обнаружен след записи. Сопоставьте его с другими материалами.':'На этой стороне дополнительных следов не видно. Проверьте оборот.'):'Обычный свет · осмотрите обе стороны листа';
+ byId('lightStatus').textContent=lit?(text?(state.discoveries[key]?'След найден. Запись сохранена.':'Ведите свет по обороту листа: найдите и исследуйте скрытую запись.'):'На этой стороне дополнительных следов не видно. Проверьте оборот.'):'Обычный свет · осмотрите обе стороны листа';
 };
+
+const inspectionStyle=document.createElement('style');
+inspectionStyle.textContent=`
+#transmittedInk{position:relative;overflow:hidden;min-height:190px;touch-action:none;cursor:crosshair;background:#e5d4b4!important}
+#transmittedInk #transmittedText{opacity:1;filter:none;mask-image:radial-gradient(circle 84px at var(--beam-x,12%) var(--beam-y,50%),black 0%,transparent 100%);-webkit-mask-image:radial-gradient(circle 84px at var(--beam-x,12%) var(--beam-y,50%),black 0%,transparent 100%);transition:none;user-select:none;pointer-events:none}
+#transmittedInk .inspectionBeam{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle 90px at var(--beam-x,12%) var(--beam-y,50%),#fff8d77c 0%,transparent 100%);mix-blend-mode:screen}
+#transmittedInk.inspected #transmittedText{mask-image:none;-webkit-mask-image:none}
+#transmittedInk .scanAccess{position:relative;z-index:2;margin-top:12px;font-size:11px;padding:6px 9px}
+@media(pointer:fine){#transmittedInk .scanAccess{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);padding:0;border:0}#transmittedInk .scanAccess:focus-visible{position:relative;width:auto;height:auto;clip-path:none;padding:6px}}
+@media(prefers-reduced-motion:reduce){#transmittedInk *{animation:none!important;transition:none!important}}
+`;
+document.head.append(inspectionStyle);
 const oldPuzzle=byId('puzzleButton').onclick;
 byId('puzzleButton').onclick=()=>{
  if(state.chapter===2&&!state.discoveries['2:4']){
