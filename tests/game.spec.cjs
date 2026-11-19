@@ -53,3 +53,18 @@ for (const edition of ['demo', 'complete']) {
   });
  });
 }
+
+
+test('chapter three reconstruction remains optional and source-backed', async ({page}) => {
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/complete/');
+ await page.evaluate(()=>{state.chapter=2;state.seen[2]=[0,1,2,3,4,5];save();render();openDoc(1)});
+ await expect(page.locator('.reconstruction')).toBeVisible();
+ await page.locator('.reconstruction summary').click();
+ await page.locator('.reconstructionCheck').click();
+ await expect(page.locator('.reconstructionResult')).toContainText('Заполните все четыре');
+ await page.locator('.reconstructionLine').nth(0).locator('select').first().selectOption('0');
+ await page.locator('.reconstructionLine').nth(0).locator('select').nth(1).selectOption('1');
+ await expect(page.locator('#flip')).toBeVisible();
+ expect(errors).toEqual([]);
+});
