@@ -11,6 +11,11 @@ for (const edition of ['demo', 'complete']) {
    if (await page.locator('#introOverlay').isVisible()) await page.locator('#startCase').click();
    await page.locator('#papers .paper').nth(1).click({force:true});
    await expect(page.locator('#reader')).toBeVisible();
+   await expect(page.locator('.archiveScene')).toBeAttached();
+   await expect(page.locator('.archiveScene h3')).toContainText('Ключ без владельца');
+   await page.locator('.archiveScene summary').click();
+   await expect(page.locator('.archiveQuestion article')).toHaveCount(2);
+   await page.locator('.archiveScene summary').click();
    await expect(page.locator('.investigationActions button')).toHaveCount(3);
    await page.locator('#flip').click();
    await page.locator('#backlight').click();
