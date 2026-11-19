@@ -1,0 +1,16 @@
+name = "delo308-license"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+# Replace with real Cloudflare resources after creating them.
+[[d1_databases]]
+binding = "DB"
+database_name = "delo308-licenses"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "GAME"
+bucket_name = "delo308-private-game"
+
+[vars]
+ALLOWED_ORIGIN = "https://khrustalev18235-oss.github.io"
