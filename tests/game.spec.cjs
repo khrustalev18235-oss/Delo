@@ -15,6 +15,9 @@ for (const edition of ['demo', 'complete']) {
    await expect(page.locator('.archiveScene h3')).toContainText('Ключ без владельца');
    await page.locator('.archiveScene summary').click();
    await expect(page.locator('.archiveQuestion article')).toHaveCount(2);
+   await expect(page.locator('.theoryWorkbench')).toBeVisible();
+   await page.locator('.theoryWorkbench button').click();
+   await expect(page.locator('.theoryResult')).toContainText('Выберите два источника');
    await page.locator('.archiveScene summary').click();
    await expect(page.locator('.investigationActions button')).toHaveCount(3);
    await page.locator('#flip').click();
