@@ -16,6 +16,10 @@ for (const edition of ['demo', 'complete']) {
    await page.locator('#backlight').click();
    await expect(page.locator('#transmittedInk')).toBeVisible();
    await expect(page.locator('#transmittedText')).toContainText('21:17');
+   await page.locator('#transmittedInk').hover({position:{x:45,y:65}});
+   await page.locator('#transmittedInk').hover({position:{x:140,y:95}});
+   await page.locator('#transmittedInk').hover({position:{x:270,y:125}});
+   await expect(page.locator('#transmittedInk')).toHaveClass(/inspected/);
    await expect(page.locator('#v02Tour')).toBeHidden();
    expect(errors, 'Uncaught browser errors').toEqual([]);
   });
@@ -31,6 +35,8 @@ for (const edition of ['demo', 'complete']) {
     await page.locator('#flip').click();
     await page.locator('#backlight').click();
     await expect(page.locator('#transmittedInk')).toBeVisible();
+    await page.locator('#transmittedInk .scanAccess').evaluate(el=>el.click());
+    await expect(page.locator('#transmittedInk')).toHaveClass(/inspected/);
     await page.locator('#closeReader').click();
    }
    await page.locator('#puzzleButton').evaluate(el=>el.click());
