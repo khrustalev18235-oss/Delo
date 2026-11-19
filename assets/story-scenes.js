@@ -18,6 +18,40 @@ const hypotheses=[
  ['Управляющая скрывает важное','Что подтверждено помимо её пауз и оговорок?','Её слова искажены протоколом','Сохранился ли полный текст объяснения?'],
  ['Подвал использовали для хранения','Совпадает ли план с реальным проходом?','Ветрова удерживали за дверью B2','Кто мог запереть дверь снаружи?']
 ];
+
+const theoryStorage='delo308_theories_v1';
+const evidencePairs=[[[0,3],[0,5]],[[1,5],[1,4]],[[2,3],[1,2]],[[0,3],[2,3]],[[3,4],[3,4]],[[0,5],[1,5]]];
+let theoryRecord={};try{theoryRecord=JSON.parse(localStorage.getItem(theoryStorage)||'{}')||{}}catch(e){}
+function theoryForm(index){
+ const root=document.createElement('section');root.className='theoryWorkbench';
+ const h=document.createElement('h4');h.textContent='ПРОВЕРКА ВЕРСИИ';root.append(h);
+ const p=document.createElement('p');p.textContent='Выберите версию и два изученных документа. Ошибки не блокируют расследование.';root.append(p);
+ const saved=theoryRecord[index]||{};
+ const choices=document.createElement('div');choices.className='theoryChoices';
+ for(let i=0;i<2;i++){const l=document.createElement('label'),r=document.createElement('input');r.type='radio';r.name='theory'+index;r.value=String(i);r.checked=Number(saved.choice||0)===i;l.append(r,document.createTextNode(' '+hypotheses[index][i*2]));choices.append(l);}
+ root.append(choices);
+ const sources=document.createElement('div');sources.className='theorySources';
+ for(let k=0;k<2;k++){
+  const l=document.createElement('label'),select=document.createElement('select');l.textContent='Документ '+(k+1);
+  const blank=document.createElement('option');blank.value='';blank.textContent='Выберите материал';select.append(blank);
+  chapters[0].docs.forEach((doc,i)=>{if(!state.seen?.[0]?.includes(i))return;const o=document.createElement('option');o.value=String(i);o.textContent=doc[0];select.append(o);});
+  const selected=saved.evidence?.[k];if(selected!==undefined&&selected!==-1)select.value=String(selected);
+  l.append(select);sources.append(l);
+ }
+ root.append(sources);
+ const button=document.createElement('button');button.type='button';button.className='btn';button.textContent='СВЕРИТЬ УЛИКИ';root.append(button);
+ const result=document.createElement('p');result.className='theoryResult';result.setAttribute('role','status');result.textContent=saved.feedback||'';root.append(result);
+ button.addEventListener('click',()=>{
+  const choice=Number(choices.querySelector('input:checked').value);
+  const evidence=[...sources.querySelectorAll('select')].map(x=>x.value===''?-1:Number(x.value));
+  const needed=evidencePairs[index][choice];
+  const valid=evidence.every(x=>x>=0)&&new Set(evidence).size===2&&needed.every(x=>evidence.includes(x));
+  const feedback=evidence.some(x=>x<0)?'Выберите два источника для проверки.':new Set(evidence).size!==2?'Нужны два разных источника.':valid?'Версия получила документальную опору. Это не окончательный вывод: проверьте её против других материалов.':'Эти материалы пока не подтверждают выбранную версию. Проверьте происхождение документов и попробуйте другую пару.';
+  result.textContent=feedback;theoryRecord[index]={choice,evidence,feedback};try{localStorage.setItem(theoryStorage,JSON.stringify(theoryRecord))}catch(e){}
+ });
+ return root;
+}
+
 let renderedKey=null;
 function refresh(){
  if(reader.hidden||typeof state==='undefined')return;
@@ -36,11 +70,12 @@ function refresh(){
   const article=document.createElement('article'),h=document.createElement('strong'),p=document.createElement('p');
   h.textContent=options[i];p.textContent=options[i+1];article.append(h,p);question.append(article);
  }
+ question.append(theoryForm(index));
 }
 const docTitle=document.getElementById('docTitle');
 if(docTitle)new MutationObserver(refresh).observe(docTitle,{childList:true,characterData:true,subtree:true});
 new MutationObserver(refresh).observe(reader,{attributes:true,attributeFilter:['hidden']});
 document.getElementById('papers')?.addEventListener('click',()=>setTimeout(refresh,0));
 document.getElementById('startCase')?.addEventListener('click',()=>setTimeout(refresh,250));
-const style=document.createElement('style');style.textContent='.archiveScene{margin:22px 0 8px;border-top:1px solid #9e896a;border-bottom:1px solid #9e896a;color:#463b2d}.archiveScene summary{cursor:pointer;padding:16px 4px;font:11px/1.5 monospace;letter-spacing:1.1px;color:#64553e}.archiveScene summary:focus-visible{outline:2px solid #8d6b3c}.archiveScene h3{font:normal 23px/1.3 Georgia,serif;margin:10px 0 17px;color:#443425}.archiveScene p{font:16px/1.8 Georgia,serif;margin:0 0 15px;color:#4c4032}';style.textContent+='.archiveQuestion{border-top:1px dashed #a28c6e;padding-top:12px;margin-top:20px}.archiveQuestionHeading{font:11px/1.5 monospace!important;letter-spacing:1px;color:#66583e!important}.archiveQuestion article{padding:10px 0;border-bottom:1px solid #b5a58b}.archiveQuestion article strong{font:600 14px Georgia,serif;color:#483724}.archiveQuestion article p{font:14px/1.6 Georgia,serif;margin:6px 0!important;color:#64523f}';document.head.append(style);
+const style=document.createElement('style');style.textContent='.archiveScene{margin:22px 0 8px;border-top:1px solid #9e896a;border-bottom:1px solid #9e896a;color:#463b2d}.archiveScene summary{cursor:pointer;padding:16px 4px;font:11px/1.5 monospace;letter-spacing:1.1px;color:#64553e}.archiveScene summary:focus-visible{outline:2px solid #8d6b3c}.archiveScene h3{font:normal 23px/1.3 Georgia,serif;margin:10px 0 17px;color:#443425}.archiveScene p{font:16px/1.8 Georgia,serif;margin:0 0 15px;color:#4c4032}';style.textContent+='.archiveQuestion{border-top:1px dashed #a28c6e;padding-top:12px;margin-top:20px}.archiveQuestionHeading{font:11px/1.5 monospace!important;letter-spacing:1px;color:#66583e!important}.archiveQuestion article{padding:10px 0;border-bottom:1px solid #b5a58b}.archiveQuestion article strong{font:600 14px Georgia,serif;color:#483724}.archiveQuestion article p{font:14px/1.6 Georgia,serif;margin:6px 0!important;color:#64523f}';style.textContent+='.theoryWorkbench{padding:15px 0}.theoryWorkbench h4{font:11px monospace;letter-spacing:1px}.theoryChoices,.theorySources{display:grid;gap:9px;margin:12px 0}.theoryChoices label,.theorySources label{display:grid;gap:5px;font:14px Georgia,serif}.theorySources select{max-width:100%;padding:8px;background:#e6d7bc;color:#3b3022;border:1px solid #9c886c}.theoryResult{border-left:2px solid #8c7150;padding-left:12px;min-height:22px}';document.head.append(style);
 })();
