@@ -504,7 +504,7 @@ $v("v02Inspect").addEventListener("click",()=>$v("puzzleButton")?.click());
 $v("v02Notebook").addEventListener("click",()=>$v("notebookButton")?.click());
 $v("v02Settings").addEventListener("click",()=>$v("settingsButton")?.click());
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!tour.hidden)finish()});
-$v("startCase")?.addEventListener("click",()=>{try{if(!localStorage.getItem("delo308_guide_v02"))setTimeout(()=>show(0),150)}catch(e){}});
+/* Onboarding is now handled contextually by assets/investigation.js; do not open the obsolete six-page tour. */
 })();
 </script>
 <script src="../assets/investigation.js"></script><script>applySettings();render();</script></body></html>
