@@ -68,3 +68,21 @@ test('chapter three reconstruction remains optional and source-backed', async ({
  await expect(page.locator('#flip')).toBeVisible();
  expect(errors).toEqual([]);
 });
+
+test('chapter four dispatch rehearsal checks evidence without completing core intercept', async ({page}) => {
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('/complete/');
+ await page.evaluate(()=>{state.chapter=3;state.seen[3]=[0,1,2,3,4,5];state.puzzles[3]=false;save();render();openDoc(4)});
+ await expect(page.locator('.dispatchDecision')).toBeVisible();
+ await page.locator('.dispatchDecision summary').click();
+ await page.locator('.dispatchDecision button').click();
+ await expect(page.locator('.dispatchResult')).toContainText('Заполните все три');
+ const selects=page.locator('.dispatchBody select');
+ await selects.nth(0).selectOption('1');
+ await selects.nth(1).selectOption('1');
+ await selects.nth(2).selectOption('1');
+ await page.locator('.dispatchDecision button').click();
+ await expect(page.locator('.dispatchResult')).toContainText('Черновик обоснован');
+ expect(await page.evaluate(()=>state.puzzles[3])).toBe(false);
+ expect(errors).toEqual([]);
+});
